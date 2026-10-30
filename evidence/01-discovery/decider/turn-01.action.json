@@ -1,0 +1,1 @@
+{"tool": "act", "input": {"action": "fill", "frame": "main", "index": 0, "value": "{{username}}", "reason": "enter operator user id on the sign on screen"}}

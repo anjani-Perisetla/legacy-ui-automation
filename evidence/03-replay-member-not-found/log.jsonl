@@ -1,0 +1,10 @@
+{"ts": 1793385568.461, "type": "replay_start", "capability": "member_savings_balance", "version": 1, "inputs": {"username": "teller1", "member_number": "99999", "password": "[SECRET]"}}
+{"ts": 1793385568.798, "type": "step", "id": "s1", "action": "goto", "strategy": null, "ms": 328}
+{"ts": 1793385568.834, "type": "step", "id": "s2", "action": "fill", "strategy": "role+near", "ms": 26}
+{"ts": 1793385568.867, "type": "step", "id": "s3", "action": "fill", "strategy": "role+near", "ms": 27}
+{"ts": 1793385569.212, "type": "step", "id": "s4", "action": "click", "strategy": "role+name", "ms": 339}
+{"ts": 1793385569.559, "type": "step", "id": "s5", "action": "click", "strategy": "role+name", "ms": 335}
+{"ts": 1793385569.584, "type": "step", "id": "s6", "action": "fill", "strategy": "role+near", "ms": 12}
+{"ts": 1793385569.919, "type": "step", "id": "s7", "action": "click", "strategy": "role+name", "ms": 329}
+{"ts": 1793385569.93, "type": "condition", "name": "member_not_found", "kind": "business", "step": "checkpoint"}
+{"ts": 1793385569.93, "type": "replay_result", "status": "business_outcome", "capability": "member_savings_balance", "version": 1, "outputs": {}, "outcome": "member_not_found", "error": null, "recoveries": [], "handoffs": [], "run": "replay-20261031-000928-490d"}

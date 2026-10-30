@@ -1,0 +1,17 @@
+{
+  "status": "failure",
+  "capability": "member_savings_balance",
+  "version": 1,
+  "outputs": {},
+  "outcome": null,
+  "error": {
+    "kind": "system_error",
+    "step": "s6",
+    "expected": "no system_error screen",
+    "observed": "SYSTEM ERROR CB-500 Host communication failure. Contact IT.",
+    "screenshot": "01-failure.png"
+  },
+  "recoveries": [],
+  "handoffs": [],
+  "run": "replay-20261031-000937-9183"
+}

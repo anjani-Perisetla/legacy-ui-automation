@@ -1,0 +1,19 @@
+{
+  "run": "replay-20261031-001016-e095",
+  "reason": "checkpoint 'MEMBER DETAIL - MI02' not reached",
+  "context": {
+    "capability": "member_savings_balance",
+    "version": 1,
+    "step": "checkpoint",
+    "step_note": "",
+    "expected": "checkpoint 'MEMBER DETAIL - MI02' not reached"
+  },
+  "url": "http://127.0.0.1:8099/signon",
+  "screen_text": "SUPERVISOR OVERRIDE REQUIRED - SV09 Member account flagged for review. Enter supervisor code to continue. Code",
+  "screenshot": "01-handoff.png",
+  "how_to_take_over": {
+    "headed": null,
+    "cdp": "http://127.0.0.1:9333",
+    "resume": "python -m cua operator resume replay-20261031-001016-e095 --note '...'"
+  }
+}

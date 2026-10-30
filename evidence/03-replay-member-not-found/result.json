@@ -1,0 +1,11 @@
+{
+  "status": "business_outcome",
+  "capability": "member_savings_balance",
+  "version": 1,
+  "outputs": {},
+  "outcome": "member_not_found",
+  "error": null,
+  "recoveries": [],
+  "handoffs": [],
+  "run": "replay-20261031-000928-490d"
+}

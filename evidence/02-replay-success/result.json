@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "capability": "member_savings_balance",
+  "version": 1,
+  "outputs": {
+    "savings_balance": "88.02",
+    "member_name": "R**************E"
+  },
+  "outcome": null,
+  "error": null,
+  "recoveries": [],
+  "handoffs": [],
+  "run": "replay-20261031-000925-ddfb"
+}

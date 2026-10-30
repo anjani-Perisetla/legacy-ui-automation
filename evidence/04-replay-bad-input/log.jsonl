@@ -1,0 +1,2 @@
+{"ts": 1793385571.414, "type": "replay_start", "capability": "member_savings_balance", "version": 1, "inputs": {"username": "teller1", "member_number": "12a45", "password": "[SECRET]"}}
+{"ts": 1793385571.415, "type": "replay_result", "status": "failure", "capability": "member_savings_balance", "version": 1, "outputs": {}, "outcome": null, "error": {"kind": "bad_input", "observed": "input member_number does not match \\d{1,10}"}, "recoveries": [], "handoffs": [], "run": "replay-20261031-000931-9ff6"}

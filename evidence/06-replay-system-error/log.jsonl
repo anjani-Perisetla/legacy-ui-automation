@@ -1,0 +1,9 @@
+{"ts": 1793385577.607, "type": "fault_injected", "faults": ["error"]}
+{"ts": 1793385577.952, "type": "replay_start", "capability": "member_savings_balance", "version": 1, "inputs": {"username": "teller1", "member_number": "12345", "password": "[SECRET]"}}
+{"ts": 1793385578.323, "type": "step", "id": "s1", "action": "goto", "strategy": null, "ms": 351}
+{"ts": 1793385578.388, "type": "step", "id": "s2", "action": "fill", "strategy": "role+near", "ms": 53}
+{"ts": 1793385578.424, "type": "step", "id": "s3", "action": "fill", "strategy": "role+near", "ms": 29}
+{"ts": 1793385578.773, "type": "step", "id": "s4", "action": "click", "strategy": "role+name", "ms": 343}
+{"ts": 1793385579.122, "type": "step", "id": "s5", "action": "click", "strategy": "role+name", "ms": 337}
+{"ts": 1793385579.132, "type": "condition", "name": "system_error", "kind": "failure", "step": "s6"}
+{"ts": 1793385579.178, "type": "replay_result", "status": "failure", "capability": "member_savings_balance", "version": 1, "outputs": {}, "outcome": null, "error": {"kind": "system_error", "step": "s6", "expected": "no system_error screen", "observed": "SYSTEM ERROR CB-500 Host communication failure. Contact IT.", "screenshot": "01-failure.png"}, "recoveries": [], "handoffs": [], "run": "replay-20261031-000937-9183"}

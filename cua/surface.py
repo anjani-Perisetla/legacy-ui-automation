@@ -7,6 +7,7 @@ methods against the Windows UIA / macOS AX tree. See REPORT.md section 4.
 """
 from __future__ import annotations
 
+import re
 import time
 from pathlib import Path
 from typing import Callable, List, Optional
@@ -17,6 +18,7 @@ from .artifact import Read, Target
 from .policy import Policy, PolicyViolation
 
 DOM_JS = (Path(__file__).parent / "dom.js").read_text()
+_SENSITIVE = re.compile(r"\b\d{3}-\d{2}-\d{4}\b|\b\d{2}/\d{2}/\d{4}\b|\b\d{9,19}\b")
 
 # Recorder for human actions. Listens in every frame, reports through a binding;
 # Python decides whether to keep the events (only while a human holds control).
@@ -128,7 +130,10 @@ class WebSurface:
         return self.frame(q.frame).evaluate(DOM_JS, {"op": "read", "query": q.model_dump()})
 
     def screenshot(self, path: Path) -> None:
-        self.page.screenshot(path=str(path))
+        # evidence screenshots get the same treatment as logs: cells holding an
+        # SSN, date of birth or long account number are blacked out
+        masks = [f.locator("td", has_text=_SENSITIVE) for f in self.page.frames]
+        self.page.screenshot(path=str(path), mask=masks, mask_color="#000000")
 
     # --- actions -----------------------------------------------------------
     def goto(self, path: str) -> None:

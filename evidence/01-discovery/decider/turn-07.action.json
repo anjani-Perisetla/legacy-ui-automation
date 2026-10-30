@@ -1,0 +1,6 @@
+{"tool": "finish", "input": {"checkpoint_frame": "main", "checkpoint_text": "MEMBER DETAIL - MI02",
+ "outputs": [
+  {"name": "savings_balance", "type": "money", "frame": "main", "row": "SHARE SAVINGS", "column": "Balance", "description": "current balance of the member's share savings account (suffix S01)"},
+  {"name": "member_name", "type": "string", "frame": "main", "label": "Name", "description": "member name as shown on the detail screen"}
+ ],
+ "input_descriptions": {"username": "teller operator id", "password": "teller operator password", "member_number": "member (account holder) number, digits only"}}}

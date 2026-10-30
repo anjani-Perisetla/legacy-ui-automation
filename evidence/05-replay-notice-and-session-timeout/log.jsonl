@@ -1,0 +1,20 @@
+{"ts": 1793385572.757, "type": "fault_injected", "faults": ["notice", "timeout"]}
+{"ts": 1793385573.042, "type": "replay_start", "capability": "member_savings_balance", "version": 1, "inputs": {"username": "teller1", "member_number": "12345", "password": "[SECRET]"}}
+{"ts": 1793385573.383, "type": "step", "id": "s1", "action": "goto", "strategy": null, "ms": 331}
+{"ts": 1793385573.42, "type": "step", "id": "s2", "action": "fill", "strategy": "role+near", "ms": 25}
+{"ts": 1793385573.457, "type": "step", "id": "s3", "action": "fill", "strategy": "role+near", "ms": 30}
+{"ts": 1793385573.807, "type": "step", "id": "s4", "action": "click", "strategy": "role+name", "ms": 344}
+{"ts": 1793385574.159, "type": "step", "id": "s5", "action": "click", "strategy": "role+name", "ms": 341}
+{"ts": 1793385574.169, "type": "condition", "name": "session_expired", "kind": "recoverable", "step": "s6"}
+{"ts": 1793385574.169, "type": "recover", "name": "session_expired", "action": "restart"}
+{"ts": 1793385574.492, "type": "step", "id": "s1", "action": "goto", "strategy": null, "ms": 322}
+{"ts": 1793385574.515, "type": "step", "id": "s2", "action": "fill", "strategy": "role+near", "ms": 15}
+{"ts": 1793385574.532, "type": "step", "id": "s3", "action": "fill", "strategy": "role+near", "ms": 9}
+{"ts": 1793385574.885, "type": "step", "id": "s4", "action": "click", "strategy": "role+name", "ms": 346}
+{"ts": 1793385575.242, "type": "step", "id": "s5", "action": "click", "strategy": "role+name", "ms": 344}
+{"ts": 1793385575.271, "type": "step", "id": "s6", "action": "fill", "strategy": "role+near", "ms": 15}
+{"ts": 1793385575.605, "type": "step", "id": "s7", "action": "click", "strategy": "role+name", "ms": 328}
+{"ts": 1793385575.617, "type": "condition", "name": "system_notice", "kind": "recoverable", "step": "checkpoint"}
+{"ts": 1793385575.947, "type": "recover", "name": "system_notice", "action": "click"}
+{"ts": 1793385576.256, "type": "checkpoint", "ok": true, "text": "MEMBER DETAIL - MI02"}
+{"ts": 1793385576.259, "type": "replay_result", "status": "success", "capability": "member_savings_balance", "version": 1, "outputs": {"savings_balance": "1234.56", "member_name": "J***********E"}, "outcome": null, "error": null, "recoveries": ["session_expired: restarted flow", "system_notice: clicked Continue"], "handoffs": [], "run": "replay-20261031-000932-87db"}

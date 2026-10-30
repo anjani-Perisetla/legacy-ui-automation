@@ -9,14 +9,16 @@ Every action passes the policy check before it touches the browser.
 """
 from __future__ import annotations
 
+import json
 import re
+import time
 from typing import Dict, List, Optional
 
 import anthropic
 
 from .artifact import Capability, Checkpoint, InputSpec, OutputSpec, Read, Step, Target
 from .handoff import assert_automation, request_human, set_control
-from .policy import PolicyViolation, redact
+from .policy import PolicyViolation, mask_value, redact
 from .surface import TargetNotFound
 
 MODEL = "claude-opus-5-5"
@@ -109,71 +111,126 @@ def render_screen(frames: List[dict], secrets) -> str:
     return "\n".join(parts)
 
 
+class ClaudeDecider:
+    """Calls the Claude API. Keeps the conversation, one tool call per turn."""
+    name = MODEL
+
+    def __init__(self, log, client: Optional[anthropic.Anthropic] = None):
+        self.log = log
+        self.client = client or anthropic.Anthropic()
+        self.messages: list = []
+        self._pending = None
+
+    def decide(self, observation: str, last_result: Optional[str]):
+        if self._pending is None:
+            self.messages.append({"role": "user", "content": observation})
+        else:
+            self.messages.append({"role": "user", "content": [
+                {"type": "tool_result", "tool_use_id": self._pending, "content": last_result},
+                {"type": "text", "text": observation},
+            ]})
+        for _ in range(3):
+            resp = self.client.messages.create(
+                model=MODEL, max_tokens=16000, system=SYSTEM, tools=TOOLS,
+                tool_choice={"type": "auto", "disable_parallel_tool_use": True},
+                output_config={"effort": "medium"},
+                messages=self.messages,
+            )
+            self.log.event("llm", stop_reason=resp.stop_reason,
+                           input_tokens=resp.usage.input_tokens, output_tokens=resp.usage.output_tokens,
+                           text=" ".join(b.text for b in resp.content if b.type == "text")[:500])
+            self.messages.append({"role": "assistant", "content": resp.content})
+            if resp.stop_reason == "refusal":
+                return None
+            call = next((b for b in resp.content if b.type == "tool_use"), None)
+            if call:
+                self._pending = call.id
+                return call.name, call.input
+            self.messages.append({"role": "user", "content": "Use one of the tools."})
+        return None
+
+
+class FileDecider:
+    """Decisions come from outside the process through files, for when there is
+    no API access from this machine. Each turn writes turn-NN.prompt.txt (system
+    prompt, tools, observation) and waits for turn-NN.action.json containing
+    {"tool": ..., "input": {...}}. Whoever answers sees only what an API model
+    would see, so the run exercises the same loop, policy and recorder."""
+    name = "file"
+
+    def __init__(self, log, timeout_s: int = 1800):
+        self.log = log
+        self.turn = 0
+        self.timeout_s = timeout_s
+        (log.dir / "decider").mkdir(exist_ok=True)
+        (log.dir / "decider" / "system.txt").write_text(SYSTEM + "\n\nTOOLS:\n" + json.dumps(TOOLS, indent=2))
+
+    def decide(self, observation: str, last_result: Optional[str]):
+        self.turn += 1
+        d = self.log.dir / "decider"
+        body = observation if last_result is None else "Result of your last action: %s\n\n%s" % (last_result, observation)
+        (d / ("turn-%02d.prompt.txt" % self.turn)).write_text(body + "\n")
+        answer = d / ("turn-%02d.action.json" % self.turn)
+        print("waiting for %s" % answer, flush=True)
+        end = time.time() + self.timeout_s
+        while not answer.exists():
+            if time.time() > end:
+                return None
+            time.sleep(0.5)
+        time.sleep(0.2)
+        a = json.loads(answer.read_text())
+        return a["tool"], a["input"]
+
+
 class Discovery:
-    def __init__(self, surface, policy, log, app_id: str, client: Optional[anthropic.Anthropic] = None):
+    def __init__(self, surface, policy, log, app_id: str, decider=None):
         self.s = surface
         self.policy = policy
         self.log = log
         self.app_id = app_id
-        self.client = client or anthropic.Anthropic()
+        self.decider = decider or ClaudeDecider(log)
         self.steps: List[Step] = []
 
     def run(self, goal: str, entry: str, inputs: Dict[str, str], secret_inputs: List[str],
             capability_id: str) -> Optional[Capability]:
         secrets = [inputs[k] for k in secret_inputs]
         set_control(self.log.dir, "automation")
-        self.log.event("discovery_start", goal=goal, entry=entry, model=MODEL,
+        self.log.event("discovery_start", goal=goal, entry=entry, decider=self.decider.name,
                        inputs={k: ("[SECRET]" if k in secret_inputs else v) for k, v in inputs.items()})
 
         self.s.goto(entry)
         self.steps.append(Step(id="s1", action="goto", value=entry, note="open the app"))
 
         input_list = ", ".join("{{%s}}%s" % (k, " (secret)" if k in secret_inputs else "") for k in inputs)
-        messages = [{"role": "user", "content":
-                     "Goal: %s\nAvailable inputs: %s\n\nCurrent screen:\n%s"
-                     % (goal, input_list, render_screen(self.s.observe(), secrets))}]
+        observation = "Goal: %s\nAvailable inputs: %s\n\nCurrent screen:\n%s" % (
+            goal, input_list, render_screen(self.s.observe(), secrets))
+        result = None
 
         for turn in range(MAX_STEPS):
-            resp = self.client.messages.create(
-                model=MODEL, max_tokens=16000, system=SYSTEM, tools=TOOLS,
-                tool_choice={"type": "auto", "disable_parallel_tool_use": True},
-                output_config={"effort": "medium"},
-                messages=messages,
-            )
-            self.log.event("llm", turn=turn, stop_reason=resp.stop_reason,
-                           input_tokens=resp.usage.input_tokens, output_tokens=resp.usage.output_tokens,
-                           text=" ".join(b.text for b in resp.content if b.type == "text")[:500])
-            messages.append({"role": "assistant", "content": resp.content})
-
-            if resp.stop_reason == "refusal":
-                self.log.event("discovery_end", ok=False, reason="model refused")
+            decision = self.decider.decide(observation, result)
+            if decision is None:
+                self.log.event("discovery_end", ok=False, reason="no decision (refused or timed out)")
                 return None
-            call = next((b for b in resp.content if b.type == "tool_use"), None)
-            if call is None:
-                messages.append({"role": "user", "content": "Use one of the tools."})
-                continue
-
-            self.log.event("decision", tool=call.name, input=call.input)
-            if call.name == "finish":
-                cap, problem = self._build(call.input, goal, entry, inputs, secret_inputs, capability_id)
+            tool, args = decision
+            self.log.event("decision", turn=turn, tool=tool, input=args)
+            if tool == "finish":
+                cap, problem = self._build(args, goal, entry, inputs, secret_inputs, capability_id)
                 if cap:
                     self.log.event("discovery_end", ok=True, steps=len(cap.steps))
                     return cap
                 result = "finish rejected: %s. Fix it or keep going." % problem
-            elif call.name == "ask_human":
-                h = request_human(self.s, self.log, call.input["reason"], {"goal": goal, "step": len(self.steps)})
+            elif tool == "ask_human":
+                h = request_human(self.s, self.log, args["reason"], {"goal": goal, "step": len(self.steps)})
                 result = "A human operated the screen and handed back. Note: %r. Actions: %s" % (
                     h["note"], h["actions"])
                 # what the human did is not part of the capability; if it was
                 # needed, the capability needs another discovery or a review.
+            elif tool == "act":
+                result = self._act(args, inputs, secrets)
             else:
-                result = self._act(call.input, inputs, secrets)
-
-            screen = render_screen(self.s.observe(), secrets)
-            messages.append({"role": "user", "content": [
-                {"type": "tool_result", "tool_use_id": call.id, "content": result},
-                {"type": "text", "text": "Current screen:\n" + screen},
-            ]})
+                result = "error: unknown tool %s" % tool
+            self.log.event("result", turn=turn, result=result)
+            observation = "Current screen:\n" + render_screen(self.s.observe(), secrets)
 
         self.log.event("discovery_end", ok=False, reason="max steps")
         return None
@@ -232,7 +289,7 @@ class Discovery:
             v = self.s.read(q)
             if v is None:
                 return None, "could not read %s with %s" % (o["name"], q.model_dump(exclude_none=True))
-            self.log.event("output_check", name=o["name"], value=redact(v))
+            self.log.event("output_check", name=o["name"], found=True, value=mask_value(v))
             outputs[o["name"]] = OutputSpec(type=o["type"], description=o.get("description", ""), read=q)
         descs = fin.get("input_descriptions") or {}
         cap = Capability(

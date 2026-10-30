@@ -1,0 +1,14 @@
+Result of your last action: ok
+
+Current screen:
+=== frame 'banner'  http://127.0.0.1:8099/banner
+CU*CORE 3.2 Branch 001 Operator: teller1
+=== frame 'menu'  http://127.0.0.1:8099/menu
+MAIN MENU MI01 Member Inquiry TR02 Share Transfer RP01 Reports Sign Off
+  [0] link 'MI01 Member Inquiry' label='MAIN MENU'
+  [1] link 'TR02 Share Transfer' label='MI01 Member Inquiry'
+  [2] link 'RP01 Reports' label='TR02 Share Transfer'
+  [3] link 'Sign Off' label='RP01 Reports'
+=== frame 'main'  http://127.0.0.1:8099/inquiry
+MEMBER DETAIL - MI02 Member # 12345 Name JANE Q SAMPLE SSN ***-**-6789 DOB **/**/1981 Suffix Description Balance S01 SHARE SAVINGS 1,234.56 S10 CHRISTMAS CLUB 310.00 D20 SHARE DRAFT CHECKING 2,087.13 New Inquiry
+  [0] link 'New Inquiry' label='CLUB310.00D20SHARE DRAFT CHECKING2,087.13'

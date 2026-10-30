@@ -22,6 +22,10 @@ One Python process, four parts with narrow interfaces between them:
   use, one action per turn). The model gets a redacted text view of each frame and a
   numbered list of controls; it answers with `act`, `finish` or `ask_human`. Every
   action it takes is recorded as a step in operator terms.
+  The model sits behind a one-method `decide(observation, last_result)` interface:
+  `ClaudeDecider` calls the API, `FileDecider` exchanges turns through files. The run
+  in `evidence/` used the file decider because no API key was available (details in
+  `evidence/README.md`).
 - **Replay** (`replay.py`) runs a capability with inputs and returns a structured result.
 - **App profile** (`targets/cucore/profile.json`) holds what is true for the whole app
   rather than one task: the policy, and the screens the app can throw at you (not found,
@@ -202,8 +206,9 @@ and take input there; the control model and capture would not change.
   model as placeholders, are templated into artifacts, and are replaced with `[SECRET]`
   in every log line.
 - **PII.** Screen text is redacted before it goes to the model and before it is logged
-  (SSN to last four, long account numbers, dates of birth). Outputs flagged `pii` are
-  returned to the caller but masked in logs.
+  (SSN to last four, long account numbers, dates of birth). Screenshots black out table
+  cells holding those patterns. Outputs flagged `pii` are returned to the caller but
+  masked in logs and in the saved result.
 
 Limits: risk classification by label is a blunt instrument; an unlisted destructive
 button is treated as safe in discovery (replay is still gated by review and approval).

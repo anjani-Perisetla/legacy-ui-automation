@@ -16,7 +16,7 @@ from pathlib import Path
 
 from .artifact import Capability, Target
 from .handoff import read_control, set_control
-from .policy import Policy
+from .policy import Policy, mask_value
 from .runlog import RunLog
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -47,7 +47,7 @@ def make_surface(profile, args):
 
 
 def cmd_discover(args):
-    from .agent import Discovery
+    from .agent import ClaudeDecider, Discovery, FileDecider
     profile = load_profile(args.app)
     inputs = parse_kv(args.input)
     secrets = parse_kv(args.secret)
@@ -55,7 +55,8 @@ def cmd_discover(args):
     log = RunLog(RUNS, "discover", secrets=secrets.values())
     s = make_surface(profile, args)
     try:
-        cap = Discovery(s, Policy.from_profile(profile), log, args.app).run(
+        decider = FileDecider(log) if args.decider == "file" else ClaudeDecider(log)
+        cap = Discovery(s, Policy.from_profile(profile), log, args.app, decider).run(
             args.goal, args.entry, inputs, list(secrets), args.capability_id)
         if cap is None:
             log.screenshot(s, "discovery-failed")
@@ -95,7 +96,9 @@ def cmd_replay(args):
     try:
         r = Replayer(cap, profile, s, log, escalate=args.escalate, approvals=args.approve or [],
                      allow_draft=args.allow_draft).run(params)
-        log.write_json("result.json", r.to_dict())
+        saved = r.to_dict()  # what goes to disk has pii outputs masked
+        saved["outputs"] = {k: (mask_value(v) if cap.outputs[k].pii else v) for k, v in r.outputs.items()}
+        log.write_json("result.json", saved)
         print(json.dumps(r.to_dict(), indent=2))
         return 0 if r.status != "failure" else 2
     finally:
@@ -191,6 +194,8 @@ def main(argv=None):
     d.add_argument("--input", action="append")
     d.add_argument("--secret", action="append", help="name=env:VAR")
     d.add_argument("--out")
+    d.add_argument("--decider", choices=["claude", "file"], default="claude",
+                   help="claude: Claude API (needs ANTHROPIC_API_KEY); file: answers come from files")
     surface_args(d)
 
     r = sub.add_parser("replay")

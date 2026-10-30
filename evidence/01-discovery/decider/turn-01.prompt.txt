@@ -1,0 +1,11 @@
+Goal: Sign on, look up member {{member_number}} and read their share savings balance and name
+Available inputs: {{username}}, {{member_number}}, {{password}} (secret)
+
+Current screen:
+=== frame 'banner'  http://127.0.0.1:8099/banner
+CU*CORE 3.2 Branch 001 Operator: NOT SIGNED ON
+=== frame 'main'  http://127.0.0.1:8099/main
+SIGN ON User ID Password
+  [0] textbox '' label='User ID'
+  [1] textbox '' label='Password'
+  [2] button 'Sign On'

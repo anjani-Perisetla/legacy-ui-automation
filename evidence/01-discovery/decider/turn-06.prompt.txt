@@ -1,0 +1,15 @@
+Result of your last action: ok
+
+Current screen:
+=== frame 'banner'  http://127.0.0.1:8099/banner
+CU*CORE 3.2 Branch 001 Operator: teller1
+=== frame 'menu'  http://127.0.0.1:8099/menu
+MAIN MENU MI01 Member Inquiry TR02 Share Transfer RP01 Reports Sign Off
+  [0] link 'MI01 Member Inquiry' label='MAIN MENU'
+  [1] link 'TR02 Share Transfer' label='MI01 Member Inquiry'
+  [2] link 'RP01 Reports' label='TR02 Share Transfer'
+  [3] link 'Sign Off' label='RP01 Reports'
+=== frame 'main'  http://127.0.0.1:8099/inquiry
+MEMBER INQUIRY - MI01 Member Number
+  [0] textbox '' label='Member Number'
+  [1] button 'Go' label='Member Number'

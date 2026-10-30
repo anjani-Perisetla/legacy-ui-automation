@@ -1,0 +1,1 @@
+{"tool": "act", "input": {"action": "fill", "frame": "main", "index": 1, "value": "{{password}}", "reason": "enter the operator password"}}

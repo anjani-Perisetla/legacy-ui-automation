@@ -22,8 +22,8 @@ pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-Discovery needs an Anthropic API key (`ANTHROPIC_API_KEY`). Replay, the tests and the
-handoff demo do not.
+Discovery with `--decider claude` (the default) needs `ANTHROPIC_API_KEY`. Replay, the
+tests and the handoff demo do not.
 
 The mock app's test operator is `teller1` / `demo-pass-1`. The password is passed by
 environment variable so it never appears on a command line, in a log or in an artifact:
@@ -45,6 +45,11 @@ python -m mockapp.server --port 8099
 ```bash
 python -m cua discover --capability-id member_savings_balance --goal "Sign on, look up member {{member_number}} and read their share savings balance and name" --input username=teller1 --input member_number=12345 --secret password=env:CUCORE_PASSWORD
 ```
+
+Without an API key, add `--decider file`: the loop then writes each turn's screen to
+`runs/<run-id>/decider/turn-NN.prompt.txt` and waits for the next action in
+`turn-NN.action.json`. That is how the run in `evidence/` was produced; see
+[evidence/README.md](evidence/README.md).
 
 2. Review the artifact, then approve it. Draft capabilities refuse unattended replay.
 

@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "capability": "member_savings_balance",
+  "version": 1,
+  "outputs": {
+    "savings_balance": "1234.56",
+    "member_name": "J***********E"
+  },
+  "outcome": null,
+  "error": null,
+  "recoveries": [
+    "session_expired: restarted flow",
+    "system_notice: clicked Continue"
+  ],
+  "handoffs": [],
+  "run": "replay-20261031-000932-87db"
+}

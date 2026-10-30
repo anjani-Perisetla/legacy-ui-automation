@@ -1,0 +1,10 @@
+Result of your last action: ok
+
+Current screen:
+=== frame 'banner'  http://127.0.0.1:8099/banner
+CU*CORE 3.2 Branch 001 Operator: NOT SIGNED ON
+=== frame 'main'  http://127.0.0.1:8099/main
+SIGN ON User ID Password
+  [0] textbox '' label='User ID'
+  [1] textbox '' label='Password'
+  [2] button 'Sign On'

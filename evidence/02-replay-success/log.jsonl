@@ -1,0 +1,10 @@
+{"ts": 1793385565.42, "type": "replay_start", "capability": "member_savings_balance", "version": 1, "inputs": {"username": "teller1", "member_number": "20001", "password": "[SECRET]"}}
+{"ts": 1793385565.758, "type": "step", "id": "s1", "action": "goto", "strategy": null, "ms": 329}
+{"ts": 1793385565.802, "type": "step", "id": "s2", "action": "fill", "strategy": "role+near", "ms": 31}
+{"ts": 1793385565.837, "type": "step", "id": "s3", "action": "fill", "strategy": "role+near", "ms": 29}
+{"ts": 1793385566.188, "type": "step", "id": "s4", "action": "click", "strategy": "role+name", "ms": 345}
+{"ts": 1793385566.547, "type": "step", "id": "s5", "action": "click", "strategy": "role+name", "ms": 345}
+{"ts": 1793385566.574, "type": "step", "id": "s6", "action": "fill", "strategy": "role+near", "ms": 14}
+{"ts": 1793385566.91, "type": "step", "id": "s7", "action": "click", "strategy": "role+name", "ms": 330}
+{"ts": 1793385566.917, "type": "checkpoint", "ok": true, "text": "MEMBER DETAIL - MI02"}
+{"ts": 1793385566.921, "type": "replay_result", "status": "success", "capability": "member_savings_balance", "version": 1, "outputs": {"savings_balance": "88.02", "member_name": "R**************E"}, "outcome": null, "error": null, "recoveries": [], "handoffs": [], "run": "replay-20261031-000925-ddfb"}

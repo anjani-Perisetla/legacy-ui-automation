@@ -1,0 +1,155 @@
+{
+  "schema_version": "1",
+  "id": "member_savings_balance",
+  "version": 1,
+  "status": "approved",
+  "app": "cucore",
+  "app_version": "CU*CORE 3.2",
+  "description": "Sign on, look up member {{member_number}} and read their share savings balance and name",
+  "entry": "/",
+  "inputs": {
+    "username": {
+      "type": "string",
+      "description": "teller operator id",
+      "secret": false
+    },
+    "member_number": {
+      "type": "string",
+      "description": "member (account holder) number, digits only",
+      "pattern": "\\d{1,10}",
+      "secret": false
+    },
+    "password": {
+      "type": "string",
+      "description": "teller operator password",
+      "secret": true
+    }
+  },
+  "outputs": {
+    "savings_balance": {
+      "type": "money",
+      "description": "current balance of the member's share savings account (suffix S01)",
+      "read": {
+        "frame": "main",
+        "row": "SHARE SAVINGS",
+        "column": "Balance"
+      },
+      "pii": false
+    },
+    "member_name": {
+      "type": "string",
+      "description": "member name as shown on the detail screen",
+      "read": {
+        "frame": "main",
+        "label": "Name"
+      },
+      "pii": true
+    }
+  },
+  "outcomes": [
+    "member_not_found",
+    "invalid_member_number"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "action": "goto",
+      "value": "/",
+      "frame": "",
+      "risky": false,
+      "note": "open the app"
+    },
+    {
+      "id": "s2",
+      "action": "fill",
+      "target": {
+        "frame": "main",
+        "role": "textbox",
+        "name": "",
+        "near": "User ID",
+        "css": "body:nth-of-type(1) > font:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(1) > form:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > input:nth-of-type(1)"
+      },
+      "value": "{{username}}",
+      "frame": "",
+      "risky": false,
+      "note": "enter operator user id on the sign on screen"
+    },
+    {
+      "id": "s3",
+      "action": "fill",
+      "target": {
+        "frame": "main",
+        "role": "textbox",
+        "name": "",
+        "near": "Password",
+        "css": "body:nth-of-type(1) > font:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(1) > form:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(2) > input:nth-of-type(1)"
+      },
+      "value": "{{password}}",
+      "frame": "",
+      "risky": false,
+      "note": "enter the operator password"
+    },
+    {
+      "id": "s4",
+      "action": "click",
+      "target": {
+        "frame": "main",
+        "role": "button",
+        "name": "Sign On",
+        "near": "",
+        "css": "body:nth-of-type(1) > font:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(1) > form:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(1) > input:nth-of-type(1)"
+      },
+      "frame": "",
+      "risky": false,
+      "note": "submit the sign on form"
+    },
+    {
+      "id": "s5",
+      "action": "click",
+      "target": {
+        "frame": "menu",
+        "role": "link",
+        "name": "MI01 Member Inquiry",
+        "near": "MAIN MENU",
+        "css": "body:nth-of-type(1) > font:nth-of-type(1) > a:nth-of-type(1)"
+      },
+      "frame": "",
+      "risky": false,
+      "note": "open the member inquiry function"
+    },
+    {
+      "id": "s6",
+      "action": "fill",
+      "target": {
+        "frame": "main",
+        "role": "textbox",
+        "name": "",
+        "near": "Member Number",
+        "css": "body:nth-of-type(1) > font:nth-of-type(1) > form:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2) > input:nth-of-type(1)"
+      },
+      "value": "{{member_number}}",
+      "frame": "",
+      "risky": false,
+      "note": "enter the member number to look up"
+    },
+    {
+      "id": "s7",
+      "action": "click",
+      "target": {
+        "frame": "main",
+        "role": "button",
+        "name": "Go",
+        "near": "Member Number",
+        "css": "body:nth-of-type(1) > font:nth-of-type(1) > form:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > input:nth-of-type(1)"
+      },
+      "frame": "",
+      "risky": false,
+      "note": "run the inquiry"
+    }
+  ],
+  "checkpoint": {
+    "frame": "main",
+    "text": "MEMBER DETAIL - MI02"
+  },
+  "recorded_from": "discover-20261031-000817-3d12"
+}
