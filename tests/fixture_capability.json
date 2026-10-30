@@ -1,0 +1,29 @@
+{
+  "schema_version": "1",
+  "id": "member_savings_balance",
+  "version": 1,
+  "status": "approved",
+  "app": "cucore",
+  "description": "hand-written fixture used by the tests (no LLM needed)",
+  "entry": "/",
+  "inputs": {
+    "member_number": {"type": "string", "pattern": "\\d{1,10}"},
+    "username": {"type": "string"},
+    "password": {"type": "string", "secret": true}
+  },
+  "outputs": {
+    "savings_balance": {"type": "money", "read": {"frame": "main", "row": "SHARE SAVINGS", "column": "Balance"}},
+    "member_name": {"type": "string", "pii": true, "read": {"frame": "main", "label": "Name"}}
+  },
+  "outcomes": ["member_not_found", "invalid_member_number"],
+  "steps": [
+    {"id": "s1", "action": "goto", "value": "/"},
+    {"id": "s2", "action": "fill", "target": {"frame": "main", "role": "textbox", "near": "User ID"}, "value": "{{username}}"},
+    {"id": "s3", "action": "fill", "target": {"frame": "main", "role": "textbox", "near": "Password"}, "value": "{{password}}"},
+    {"id": "s4", "action": "click", "target": {"frame": "main", "role": "button", "name": "Sign On"}},
+    {"id": "s5", "action": "click", "target": {"frame": "menu", "role": "link", "name": "MI01 Member Inquiry"}},
+    {"id": "s6", "action": "fill", "target": {"frame": "main", "role": "textbox", "near": "Member Number"}, "value": "{{member_number}}"},
+    {"id": "s7", "action": "click", "target": {"frame": "main", "role": "button", "name": "Go"}}
+  ],
+  "checkpoint": {"frame": "main", "text": "MEMBER DETAIL"}
+}

@@ -1,0 +1,21 @@
+{
+  "id": "cucore",
+  "vendor": "CU*CORE (mock)",
+  "version_marker": {"frame": "banner", "text": "CU*CORE 3.2"},
+  "policy": {
+    "allowed_origins": ["http://127.0.0.1:8099"],
+    "allowed_actions": ["goto", "click", "fill", "wait_text", "read"],
+    "risky_controls": ["Post Transfer", "Approve", "Delete", "Close Account", "Submit"],
+    "blocked_paths": ["/_test/"]
+  },
+  "conditions": [
+    {"name": "member_not_found", "kind": "business", "frame": "main", "contains": "NO RECORD FOUND"},
+    {"name": "invalid_member_number", "kind": "business", "frame": "main", "contains": "ERR 104"},
+    {"name": "system_notice", "kind": "recoverable", "frame": "main", "contains": "SYSTEM NOTICE",
+     "recover": {"click": {"frame": "main", "role": "button", "name": "Continue"}}},
+    {"name": "session_expired", "kind": "recoverable", "frame": "main", "contains": "SESSION EXPIRED",
+     "recover": {"restart": true}},
+    {"name": "system_error", "kind": "failure", "frame": "main", "contains": "SYSTEM ERROR"},
+    {"name": "bad_signon", "kind": "failure", "frame": "", "contains": "INVALID USER ID OR PASSWORD"}
+  ]
+}
